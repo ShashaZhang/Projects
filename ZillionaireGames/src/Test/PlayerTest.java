@@ -3,8 +3,8 @@ package Test;
 import org.junit.Before;
 import org.junit.Test;
 
+import MapPacket.FirstMap;
 import PlayerPacket.Player;
-import PropPacket.Prop;
 import TerritoryPacket.Land;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -12,9 +12,11 @@ import static org.junit.Assert.assertThat;
 
 public class PlayerTest {
     Player player;
+    FirstMap firstMap;
     @Before
     public void setUp(){
-        player = new Player(1,"钱夫人");
+        player = new Player(1);
+        firstMap = new FirstMap();
     }
     @Test
     public void return_Qian_When_id_is_1(){
@@ -69,7 +71,8 @@ public class PlayerTest {
     public void change_property_and_money_when_player_buy_areaOne(){
         //Given
         //When
-        player.BuyArea(new Land(1,200,0));
+    	player.GetUserInput().SetInput("Y");
+        player.BuyArea(new Land(1,200,0), firstMap);
         int money = player.GetMoney();
         String fixedAssets = player.GetFixedAssets();
         //Then
@@ -80,29 +83,34 @@ public class PlayerTest {
     public void change_property_and_money_when_player_update_cottage(){
         //Given
         //When
-        player.UpdateArea(new Land(1,200,1));
+    	player.GetUserInput().SetInput("Y");
+    	player.SetMoney(1200);
+    	Land land = new Land(1,200,0);
+    	player.BuyArea(land, firstMap);
+        player.UpdateArea(land, firstMap);
         int money = player.GetMoney();
         String fixedAssets = player.GetFixedAssets();
         //Then
-        assertThat(money,is(equalTo(9800)));
-        assertThat(fixedAssets,is(equalTo("地产：空地0处；茅屋0处；洋房1处；摩天楼0处。")));
+        assertThat(money,is(equalTo(800)));
+        assertThat(fixedAssets,is(equalTo("地产：空地0处；茅屋1处；洋房0处；摩天楼0处。")));
     }
     @Test
     public void change_property_and_money_when_player_sell_house(){
         //Given
         //When
-        player.SellArea(new Land(1,200,2));
+        player.SellArea(new Land(1,200,2), firstMap);
         int money = player.GetMoney();
         String fixedAssets = player.GetFixedAssets();
         //Then
-        assertThat(money,is(equalTo(10000)));
+        assertThat(money,is(equalTo(11200)));
         assertThat(fixedAssets,is(equalTo("地产：空地0处；茅屋0处；洋房0处；摩天楼0处。")));
     }
     @Test
     public void change_prop_and_money_when_player_buy_prop(){
         //Given
         //When
-        player.BuyProp(new Prop(1));
+    	player.GetUserInput().SetInput("1");
+        player.BuyProp();
         int point = player.GetPoint();
         String prop = player.GetProp();
         //Then

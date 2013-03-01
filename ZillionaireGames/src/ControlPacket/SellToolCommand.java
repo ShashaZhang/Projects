@@ -1,19 +1,18 @@
 package ControlPacket;
 
+import MapPacket.MapBsc;
 import PlayerPacket.Player;
 import PropPacket.Prop;
 
 public class SellToolCommand extends Command {
 
 	private Prop prop;
-	private Player player;
 	
-	public SellToolCommand(int ID, Player player){
+	public SellToolCommand(int ID){
 		prop = new Prop(ID);
-		this.player = player;
 	}
 	@Override
-	public void ActCommand() {
+	public void ActCommand(Player player,MapBsc Map) {
 		player.SellProp(prop);
 	}
 

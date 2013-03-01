@@ -1,21 +1,21 @@
 package ControlPacket;
 
+import MapPacket.MapBsc;
 import PlayerPacket.Player;
 import TerritoryPacket.Land;
 
 public class SellCommand extends Command{
 
-	private Land land;
-	private Player player;
+	private int HouseID;
 	
-	public SellCommand(int houseID, Player player){
-		this.player = player;
-		//this.land = 通过地图类找到这块地
+	public SellCommand(int HouseID){
+		this.HouseID = HouseID;
 	}
 	
 	@Override
-	public void ActCommand() {
-		this.player.SellArea(land);
+	public void ActCommand(Player player, MapBsc Map) {
+		Land Territory = (Land) Map.GetMapPointList().get(HouseID);
+		player.SellArea(Territory,Map);
 	}
 
 }

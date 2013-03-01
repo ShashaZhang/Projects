@@ -1,32 +1,26 @@
+package Test;
+
+import MapPacket.FirstMap;
 import PlayerPacket.Player;
 import TerritoryPacket.ToolsHouse;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
 
-/**
- * Created with IntelliJ IDEA.
- * User: nove
- * Date: 13-2-25
- * Time: 下午8:02
- * To change this template use File | Settings | File Templates.
- */
 public class TestToolHouse {
+	private FirstMap Map = new FirstMap();
     @Test
     public void Test_buy_one_roadblock(){
-        ToolsHouse toolsHouse=new ToolsHouse();
-        Player player=new Player(1,"XiaoLi");
-        toolsHouse.EnterToolHouse(player);
-        assertThat(1,is(player.RoadBlockCount));
+        ToolsHouse toolsHouse=new ToolsHouse(28);
+        Player player=new Player(1);
+        player.SetPoint(50);
+        player.GetUserInput().SetInput("1");
+        toolsHouse.EnterTerritory(player, Map);
+        String str = player.GetProp();
+        assertThat(str,is(equalTo("道具：路障1个；炸弹0个；机器娃娃0个。")));
     }
 
-    public void Test_buy_one_RoboticDoll(){
-        ToolsHouse toolsHouse=new ToolsHouse();
-        Player player=new Player(1,"XiaoLi");
-        toolsHouse.EnterToolHouse(player);
-        assertThat(1,is(player.RoadBlockCount));
-    }
-
-
+   
 }

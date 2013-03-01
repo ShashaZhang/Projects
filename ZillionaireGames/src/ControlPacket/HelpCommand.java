@@ -1,10 +1,13 @@
 package ControlPacket;
 
+import MapPacket.MapBsc;
+import PlayerPacket.Player;
+
 public class HelpCommand extends Command {
 
 	public HelpCommand(){}
 	@Override
-	public void ActCommand() {
+	public void ActCommand(Player player ,MapBsc map) {
 		System.out.println("roll 掷骰子命令，行走1~6步，步数由随机算法产生。");
 		System.out.println("block n 玩家拥有路障后，可将路障放置到离当前位置前后10步的距离"+
 		"任一玩家经过路障，都将会被拦截。该道具一次有效。n 前后的相对距离，负数表示后方。");

@@ -1,30 +1,50 @@
 package TerritoryPacket;
 
-import java.util.List;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
 
-/**
- * Created with IntelliJ IDEA.
- * User: nove
- * Date: 13-2-25
- * Time: 上午11:22
- * To change this template use File | Settings | File Templates.
- */
+import MapPacket.MapBsc;
+import PlayerPacket.Player;
+
 public class Land extends TerritoryBsc{
 
-    private int id;
-    private int basePrice;//base Price
-    private int ownBy;
+    private int basePrice;
+    private int OwnBy;
     private int type;
+    private static int ID;
     
     private final static int AREA = 0;
     private final static int COTTAGE = 1;
-    private final static int HOUSE = 2;
-    private final static int SKYSCRAPER = 3;
+	private final static int HOUSE = 2;
+	private final static int SKYSCRAPPER = 3;
+	
+	private final static int OwnBySystem = -1;
 
-    public Land(int id, int basePrice, int type) {
-        this.id = id;
+	public Land(){
+		super(ID,'0');
+	}
+	
+    public Land(int id,int basePrice, int type) {
+    	super(id,'0');
         this.basePrice = basePrice;
         this.type = type;
+        this.SetID(id);
+    }
+    
+    public char GetDisplay(){
+    	switch (this.type){
+    	case AREA:
+    		return '0';
+    	case COTTAGE:
+    		return '1';
+    	case HOUSE:
+    		return '2';
+    	case SKYSCRAPPER:
+    		return '3';
+    	default:
+    		return ' ';
+    	}
     }
 
     public int GetBasePrice() {
@@ -33,61 +53,95 @@ public class Land extends TerritoryBsc{
     public int GetType(){
         return type;
     }
-    
-    public void UpgradeType(){
-    	this.type++;
-    }
-    public void SetType(int type){
-    	this.type = type;
-    }
 
     public int GetSellPrice(){
         return basePrice * (type + 1) * 2;
     }
 
-    /*public void SetBasePrice(){
-    	if(this.id >= 1 && this.id <= 13)
-    		this.basePrice = 200;
-    }*/
-    
-    public void setOwnBy(int ownBy) {
-        this.ownBy = ownBy;
+    public void SetOwnBy(int ownBy) {
+        this.OwnBy = ownBy;
     }
     
-    public static String CalculateFixedAssets(List<Land> LandList){
-    	int AreaCount = 0;
-    	int CottageCount = 0;
-    	int HouseCount = 0;
-    	int SkyscraperCount = 0;
-    	for(int i = 0; i < LandList.size(); i++){
-    		Land land = LandList.get(i);
-    		switch(land.GetType()){
-    		case AREA:
-    			AreaCount++;
-    			break;
-    		case COTTAGE:
-    			CottageCount++;
-    			break;
-    		case HOUSE:
-    			HouseCount++;
-    			break;
-    		case SKYSCRAPER:
-    			SkyscraperCount++;
-    			break;
-    		}
-    	}
-		return "地产：空地"+AreaCount+"处；"
-                +"茅屋"+CottageCount+"处；"
-                +"洋房"+HouseCount+"处；"
-                +"摩天楼"+SkyscraperCount+"处。";
+    public int GetOwnBy(){
+    	return this.OwnBy;
     }
-    
-    public static void ReturnFixedAssets(List<Land> LandList){
-    	for(int i = 0; i < LandList.size(); i++){
-    		Land land = LandList.get(i);
-    		land.setOwnBy(-1);
-    		land.SetType(AREA);
-    	}
-    }
+
+	public static String CalculateFixedAssets(Hashtable<Integer,Land> landList) {
+		int AreaCount = 0;
+		int CottageCount = 0;
+		int HouseCount = 0;
+		int SkyScrapperCount = 0;
+		for(Iterator<Integer> it = landList.keySet().iterator(); it.hasNext();){
+			int id = it.next();
+			switch(landList.get(id).GetType()){
+			case AREA:
+				AreaCount++;
+				break;
+			case COTTAGE:
+				CottageCount++;
+				break;
+			case HOUSE:
+				HouseCount++;
+				break;
+			case SKYSCRAPPER:
+				SkyScrapperCount++;
+				break;
+			}
+		}
+		
+		return "地产：空地"+AreaCount+"处；茅屋"+CottageCount+"处；洋房"+HouseCount+"处；摩天楼"+SkyScrapperCount+"处。";
+	}
+
+	public void UpgradeType() {
+		this.type++;
+	}
+
+	public void SetType(int type) {
+		this.type = type;
+	}
+
+	public static void ReturnFixedAssets(Hashtable<Integer,Land> LandHashTable) {
+		Set<Integer> LandIDCollection = (Set<Integer>) LandHashTable.keySet();
+		for(int i : LandIDCollection){
+			Land land = LandHashTable.get(i);
+			land.SetOwnBy(-1);
+			land.SetType(0);
+			land.SetRoadBlock(null);
+			land.SetBomb(null);
+		}
+	}
+
+	public int GetID() {
+		return ID;
+	}
+
+	public void SetID(int iD) {
+		ID = iD;
+	}
+
+	public int PassByFee(){
+		return this.basePrice / 2 * (this.type + 1);
+	}
+	
+	@Override
+	public void EnterTerritory(Player player,MapBsc Map) {
+		if(this.OwnBy == OwnBySystem)
+		{
+			while(!player.GetUserInput().GetValidatedInput()){
+				System.out.println("是否购买该处空地，"+this.basePrice+"元（Y/N）？");
+				player.GetUserInput().YNValidated();
+			}
+			player.BuyArea(this,Map);
+		}
+		else if(this.OwnBy == player.GetID()){
+			while(!player.GetUserInput().GetValidatedInput()){
+				System.out.println("是否升级该处地产，"+this.basePrice+"元（Y/N）？");
+				player.GetUserInput().YNValidated();
+			}
+			player.UpdateArea(this,Map);
+		}
+		else
+			player.StepIntoOtherTerritory(this);
+	}
 
 }

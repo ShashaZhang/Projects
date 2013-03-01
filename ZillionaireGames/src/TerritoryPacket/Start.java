@@ -3,14 +3,15 @@ package TerritoryPacket;
 import MapPacket.MapBsc;
 import PlayerPacket.Player;
 
-public class Hospital extends TerritoryBsc {
+public class Start extends TerritoryBsc{
 
-    public Hospital(int ID){
-    	super(ID,'H');
-    }
+	public Start(){
+		super(0,'S');
+	}
 
 	@Override
 	public void EnterTerritory(Player player,MapBsc Map) {
-		player.SetStopTimes(3);
+		
 	}
+
 }

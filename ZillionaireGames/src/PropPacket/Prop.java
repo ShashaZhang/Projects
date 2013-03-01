@@ -1,25 +1,30 @@
 package PropPacket;
 
-import java.util.List;
-
-import TerritoryPacket.Land;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 public class Prop {
-	private static int ID;
+	private int ID;
 	private static String Name;
 	private int Point;
 	private String Display;
 	private int SetupBy = -1;
 	
-	private final static int ROADBLOCK = 1;
-	private final static int ROBOTICDOLL = 2;
-	private final static int BOMB = 3;
+	public final static int ROADBLOCK = 1;
+	public final static int ROBOTICDOLL = 2;
+	public final static int BOMB = 3;
 	
 	public Prop(int ID){
 		this.ID = ID;
 		SetName();
 		SetPoint();
 		SetDisplay();
+	}
+	
+	public static void InitializePlayerProps(Hashtable<Integer,Integer> PropHashTable){
+		PropHashTable.put(ROADBLOCK, 0);
+		PropHashTable.put(ROBOTICDOLL, 0);
+		PropHashTable.put(BOMB, 0);
 	}
 
 	public int GetPoint() {
@@ -42,7 +47,7 @@ public class Prop {
 		return Name;
 	}
 
-	public static void SetName() {
+	public void SetName() {
 		switch(ID){
 		case ROADBLOCK:
 			Name = "路障";
@@ -63,13 +68,13 @@ public class Prop {
 	public void SetDisplay() {
 		switch(ID){
 		case ROADBLOCK:
-			this.Name = "#";
+			this.Display = "#";
 			break;
 		case ROBOTICDOLL:
-			this.Name = "";
+			this.Display = "";
 			break;
 		case BOMB:
-			this.Name = "@";
+			this.Display = "@";
 			break;
 		}
 	}
@@ -88,29 +93,29 @@ public class Prop {
 		}
 	}
 	
-	public static String CalculateProps(List<Prop> PropList){
+	public static String CalculateProps(Hashtable<Integer,Integer> PropList){
 		int RoadBlockCount = 0;
 		int BombCount = 0;
 		int RoboticDollCount = 0;
 		
-		for(int i = 0; i < PropList.size(); i++){
-			Prop prop = PropList.get(i);
-			switch(prop.ID){
-			case ROADBLOCK:
-				RoadBlockCount++;
-				break;
-			case ROBOTICDOLL:
-				RoboticDollCount++;
-				break;
-			case BOMB:
-				BombCount++;
-				break;
-			}
+		try{
+			RoadBlockCount = PropList.get(ROADBLOCK);
+			BombCount = PropList.get(BOMB);
+			RoboticDollCount = PropList.get(ROBOTICDOLL);
 		}
+		catch(Exception e){}
 		
 		return "道具：路障"+RoadBlockCount+"个；"+
         "炸弹"+BombCount+"个；"+
         "机器娃娃"+RoboticDollCount+"个。";
+	}
+	
+	public static ArrayList<Prop> ReturnAllKindsProps(){
+		ArrayList<Prop> result = new ArrayList<Prop>();
+		result.add(new Prop(ROADBLOCK));
+		result.add(new Prop(BOMB));
+		result.add(new Prop(ROBOTICDOLL));
+		return result;
 	}
 
 }
